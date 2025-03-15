@@ -50,12 +50,33 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: gameState.cards.length,
             itemBuilder: (context, index) {
               final card = gameState.cards[index];
-              return ElevatedButton(
-                onPressed: () {
+              return GestureDetector(
+                onTap: () {
                   gameState.flipCard(index);
                 },
-                child: Text(
-                  card.isFaceUp ? card.frontDesign : card.backDesign,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  transform: Matrix4.identity()
+                    ..rotateY(card.isFaceUp ? 3.141592653589793 : 0),
+                  transformAlignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: card.isFaceUp ? Colors.blue : Colors.red,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Center(
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..rotateY(card.isFaceUp ? 3.141592653589793 : 0),
+                      child: Text(
+                        card.isFaceUp ? card.frontDesign : card.backDesign,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               );
             },
@@ -63,22 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
-  }
-}
-
-class GameState with ChangeNotifier {
-  List<CardModel> cards = [];
-
-  GameState() {
-    List<String> designs = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    designs = [...designs, ...designs];
-    designs.shuffle();
-    cards = designs.map((design) => CardModel(design)).toList();
-  }
-
-  void flipCard(int index) {
-    cards[index].isFaceUp = !cards[index].isFaceUp;
-    notifyListeners();
   }
 }
 
@@ -92,5 +97,22 @@ class CardModel {
   @override
   String toString() {
     return 'CardModel(frontDesign: $frontDesign, isFaceUp: $isFaceUp)';
+  }
+}
+
+class GameState with ChangeNotifier {
+  List<CardModel> cards = [];
+
+  GameState() {
+    List<String> designs = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    designs = [...designs, ...designs];
+    designs.shuffle();
+
+    cards = designs.map((design) => CardModel(design)).toList();
+  }
+
+  void flipCard(int index) {
+    cards[index].isFaceUp = !cards[index].isFaceUp;
+    notifyListeners();
   }
 }
